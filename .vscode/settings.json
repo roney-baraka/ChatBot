@@ -1,0 +1,7 @@
+{
+    "python.pythonPath": "/Users/ron/Documents/ChatBot/.venv/bin/python",
+    "python.analysis.extraPaths": [
+        "/Users/ron/Documents/ChatBot/.venv/lib/python3.12/site-packages"
+    ]
+
+}
