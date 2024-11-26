@@ -1,3 +1,4 @@
+ID no.	Business Name	Street address	City	State	Zip Code	Phone	Rating	Gender majority	 Median Salary 	Latte Price
 1	 Brew Haven	8 Old Shore Place	Oakland	California	94616	415-810-4769	4.50	Male	 $72,463 	$3.31
 2	 Bean Bliss	6650 Clarendon Crossing	Stockton	California	95210	209-701-1665	5.00	Female	 $87,117 	$5.35
 3	 Caffeine Cove	7281 Buell Road	Fresno	California	93773	559-137-3554	4.70	Male	 $86,394 	$4.15
@@ -23,7 +24,7 @@
 23	 Espresso Lane	55 Marcy Park	San Diego	California	92137	619-447-8771	4.10	Female	 $82,349 	$5.46
 24	 Urban Grind	55 Gulseth Street	Sacramento	California	95828	916-865-4792	3.90	Male	 $83,453 	$5.33
 25	 Brewed to Perfection	7 2nd Alley	San Francisco	California	94110	415-555-1601	4.70	Male	 $74,020 	$4.58
-26	 Bean There	1 Hoffman Crossing	San Jose	California	95173	408-827-0465	1.50	Male	 $79,007 	$5.04
+26	 Bean There, Done That	1 Hoffman Crossing	San Jose	California	95173	408-827-0465	1.50	Male	 $79,007 	$5.04
 27	 Morning Mojo	940 Troy Circle	Anaheim	California	92805	626-533-6189	4.67	Male	 $81,169 	$4.95
 28	 The Coffee Cozy	4 Dixon Place	Oxnard	California	93034	805-637-5060	4.60	Female	 $80,680 	$4.69
 29	 Caffeine Corner	3 Victoria Avenue	Corona	California	92883	626-906-4250	4.20	Male	 $89,655 	$5.69
