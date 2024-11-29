@@ -3,7 +3,7 @@ import json
 
 BACKEND_URL="https://kl296qff-8000.uks1.devtunnels.ms/docs"
 
-def chat(user_input, data, session_id=None)
+def chat(user_input, data, session_id=None):
     """
     Sends a user input to a chat API and returns the response.
 
@@ -33,7 +33,7 @@ def chat(user_input, data, session_id=None)
 
         #Set header for the API request 
         headers ={
-            "accept": "application/json"
+            "accept": "application/json",
             "Content-Type": "application/json",
         }
         
@@ -49,21 +49,111 @@ def chat(user_input, data, session_id=None)
             return response.json(["response"]["answer"], response.json()["session_id"])
         
 def upload_file(file_path):
-     #print file path for debugging 
-     print ("path", file_path)
+    #print file path for debugging 
+    print ("path", file_path)
 
-     #Extract the filename from the file path 
-     filename =  file_path.split("\\")[-1]
+    #Extract the filename from the file path 
+    filename =  file_path.split("\\")[-1]
 
-     #API endpoint for file upload 
-     url = BACKEND_URL+"/uploadFile"
-     print(url)
+    #API endpoint for file upload 
+    url = BACKEND_URL+"/uploadFile"
+    print(url)
 
-     #Prepare payload for the file upload request 
-     payload = {}
-     file = [
-         (
-             "data_file",
-             (filename, open(file_path, "rb"), "application/pdf")
-         )
-     ]
+    #Prepare payload for the file upload request 
+    payload = {}
+    file = [
+        (
+            "data_file",
+            (filename, open(file_path, "rb"), "application/pdf")
+        )
+    ]
+    #Set headers for the file upload request 
+    headers = {"accept": "application/json"}
+
+    # Make a POST request to upload the file 
+    response = requests.request("POST", url, headers=headers, data=payload, files=file)
+    print(response.status_code)
+
+    #Check if the file upload was successful (status code 200)
+    if response.status_code == 200:
+        #Print the API response for debugging
+        print(response.json())
+        #Return the file path returned by the API 
+        return response.json()["file_path"]
+
+import streamlit as st 
+import time 
+import os 
+
+#Set page configuration for the Streamlit app
+st.set_page_config(page_tittle="Document Chat", page_icon="📕", layout="wide")
+
+#Initialize chat history and session variables 
+if"messages" not in st.session_state:
+    st.session_state.messages = []
+if "sessionid" not in st.session_state:
+    st.session_state.sessionid = None
+
+#Allow user to upload a file (PDF or DOCX)
+data_file = st.file_uploader(
+    label = "Input file", accept_files = False, type = ["pdf", "docx"]
+)
+st.divider()
+
+#Process the uploaded file if available
+if data_file is not None:
+    #Save the file temporarily
+    file_path = os.path.join(os.getcwd(), "temp", data_file.name)
+    with open(file_path, "wb") as f:
+        f.write(data_file.getbuffer())
+    
+    #Upload the file to a specified API enpoint 
+    s3_upload_url = upload_file(file_path=file_path)
+
+    s3_upload_url=s3_upload_url.split("/")[-1]
+
+    #Display chat messages from history on app rerun 
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    #Accept user input 
+    if prompt := st.chat_input("You can ask any question"):
+        #Add user message to chat history 
+        st.session_state.messages.append({"role": "user", "content":prompt})
+        #Display user message in chat message container 
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        
+        # Display assistant response in chat message container 
+        with st.chat_message("assistant"):
+            if st.session_state.sessionid is None:
+                #If no existing session ID, start a new session 
+                assistant_response, session_id = chat(
+                    prompt, data=s3_upload_url, session_id=None
+                )
+                st.session_state.sessionid = session_id
+            else:
+                #If exixsting session ID, continue the session 
+                assistant_response, session_id = chat(
+                    prompt,session_id=st.session_state.sessionid, data=s3_upload_url
+                )
+            
+            message_placeholder = st.empty()
+            full_response = ""
+
+            #Stimulate stream of response with milliseconds 
+            for chunk in assistant_response.split():
+                full_response += chunk + " "
+                time.sleep(0.05)
+
+                #Add a blinking error to simulate typing 
+                message_placeholder.markdown(full_response + "▌")
+            
+            message_placeholder.markdown(full_response)
+
+        #Add assistant response to chat history
+        st.session_state.append(
+            {"role":"assistant", "content":full_response}
+        ) 
