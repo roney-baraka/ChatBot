@@ -27,10 +27,8 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain_openai import ChatOpenAI
 import gc
 
-import urllib.parse
-import awswrangler as wr  # Import AWS Wrangler for working with AWS services
-
-import boto3  # Import the boto3 library for interacting with AWS services
+from google.cloud import storage   # Import AWS Wrangler for working with AWS services
+from dotenv import load_dotenv
 
 # Import the OS module for system-related operations
 
@@ -42,21 +40,11 @@ if os.name == "nt":  # Windows
     # Load environment variables from a `.secrets.env` file (used for local development)
     load_dotenv(".secrets.env")
 
-# Retrieve and assign environment variables to variables
-# S3_KEY = os.environ.get("S3_KEY")  # AWS S3 access key
-# S3_SECRET = os.environ.get("S3_SECRET")  # AWS S3 secret access key
-# S3_BUCKET = os.environ.get("S3_BUCKET")  # AWS S3 bucket name
-# S3_REGION = os.environ.get("S3_REGION")  # AWS S3 region
-# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")  # OpenAI API key
-# MONGO_URL = os.environ.get("MONGO_URL")  # MongoDB connection URL
-# S3_PATH = os.environ.get("S3_PATH")  # AWS S3 pathi
 
 os.environ['OPENAI_API_KEY']="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"
-S3_KEY=""
-S3_SECRET=""
-S3_BUCKET=""
-S3_REGION=""
-S3_PATH=""
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+GCS_BUCKET = os.getenv("GCS_BUCKET")
+
 
 
 try:
@@ -79,7 +67,11 @@ except:
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     # Print information about the exception type, filename, and line number
     print(exc_type, fname, exc_tb.tb_lineno)
+ 
 
+#Google vloud storage client 
+storage_client = storage.Client()
+bucket = storage_client.bucket(GCS_BUCKET)
 
 
 
@@ -261,12 +253,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all HTTP headers
 )
 
-# Create an AWS S3 session with provided access credentials
-aws_s3 = boto3.Session(
-    aws_access_key_id=S3_KEY,  # Set the AWS access key ID
-    aws_secret_access_key=S3_SECRET,  # Set the AWS secret access key
-    region_name="us-east-2",  # Set the AWS region
-)
+
+
 
 
 @app.post("/chat")
